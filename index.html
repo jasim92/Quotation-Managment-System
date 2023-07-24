@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Earthone Technology LLC</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css"
+        integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+</head>
+
+<body>
+    <nav class="navbar" style="background-color: #e3f2fd;">
+        
+        <div class="container-fluid">
+            <span class="navbar-brand mb-0 h1">Quotation Management System</span>
+            <form class="d-flex" role="search" id="form">
+                <input class="search form-control me-2" type="search" placeholder="Search" aria-label="Search"
+                    id="search">
+            </form>
+        </div>
+    </nav>
+    <div class="btn-container">
+        <button type="button" class="btn btn-outline-primary" data-toggle="modal"
+            data-target="#exampleModalCenter">Add</button>
+
+    </div>
+
+    <div class="table-container">
+        <table class="table" id="myTable">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Client Name</th>
+                    <th scope="col">Quotation No.</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Issue date</th>
+                    <th scope="col">File</th>
+                </tr>
+            </thead>
+            <main id="main">
+                    <tbody id="tablesBody">
+                        
+                    </tbody>
+            </main>
+        </table>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog"
+        aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalCenterTitle">Create Quotation Entry</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="quotationForm">
+                        <div class="form-group">
+                            <label for="name">Client Name:</label>
+                            <input type="text" class="form-control" id="name" name="clientName">
+                        </div>
+                        <div class="form-group">
+                            <label for="quotationNumber">Quotation Number:</label>
+                            <input type="text" class="form-control" id="quotationNumber" name="quotationNumber">
+                        </div>
+                        <div class="form-group">
+                            <label for="status">Status:</label>
+                            <input type="text" class="form-control" id="status" name="status">
+                        </div>
+                        <div class="form-group">
+                            <label for="date">Issue Date:</label>
+                            <input type="text" class="form-control" id="date" name="issueDate">
+                        </div>
+                        <div class="form-group">
+                            <label for="file">Upload File:</label>
+                            <input type="file" class="form-control-file" id="fileInput" name="file">
+                        </div>
+
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" id="saveButton">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- <div class="pagination">
+        <li class="page-item disabled" id="prev">
+          <a class="page-link" >Previous</a>
+        </li>
+        <li class="page-item" id="current">
+          <a class="page-link"  href="#">1</a>
+        </li>
+        <li class="page-item" id="next">
+          <a class="page-link"  href="#">Next</a>
+        </li>
+      </div> -->
+
+    <script src="script.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js"
+        integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js"
+        integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>

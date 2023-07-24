@@ -1,0 +1,14 @@
+.navbar {
+    margin-bottom: 20px; /* Add margin to the bottom of the navbar */
+}
+
+.btn-container {
+    margin-top: 20px; /* Add margin to the top of the button container */
+    margin-bottom: 20px; /* Add margin to the bottom of the button container */
+    margin-left: 20px; /* Add margin to the left of the button container */
+}
+
+tbody tr:hover {
+    background-color: #e3f2fd;
+
+}

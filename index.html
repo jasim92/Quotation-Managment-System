@@ -12,7 +12,7 @@
 
 <body>
     <nav class="navbar" style="background-color: #e3f2fd;">
-        
+
         <div class="container-fluid">
             <span class="navbar-brand mb-0 h1">Quotation Management System</span>
             <form class="d-flex" role="search" id="form">
@@ -21,11 +21,28 @@
             </form>
         </div>
     </nav>
-    <div class="btn-container">
-        <button type="button" class="btn btn-outline-primary" data-toggle="modal"
+    <div class="container btn-container">
+        <div class="row">
+          <div class="col-sm text-left">
+            <button type="button" class="btn btn-outline-primary" data-toggle="modal"
             data-target="#exampleModalCenter">Add</button>
-
-    </div>
+          </div>
+          <div class="col-sm text-right">
+            <div class="dropdown">
+                <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Filter Menu
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <option class="dropdown-item" data-value="all">All</option>
+                    <option class="dropdown-item" data-value="zeeshan">Zeeshan</option>
+                    <option class="dropdown-item" data-value="salah">Salah</option>
+                    <option class="dropdown-item" data-value="zaheer">Zaheer</option>
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
     <div class="table-container">
         <table class="table" id="myTable">
@@ -36,13 +53,14 @@
                     <th scope="col">Quotation No.</th>
                     <th scope="col">Status</th>
                     <th scope="col">Issue date</th>
+                    <th scope="col">Created by</th>
                     <th scope="col">File</th>
                 </tr>
             </thead>
             <main id="main">
-                    <tbody id="tablesBody">
-                        
-                    </tbody>
+                <tbody id="tablesBody">
+
+                </tbody>
             </main>
         </table>
     </div>
@@ -66,15 +84,31 @@
                         </div>
                         <div class="form-group">
                             <label for="quotationNumber">Quotation Number:</label>
-                            <input type="text" class="form-control" id="quotationNumber" name="quotationNumber">
+                            <input type="text" class="form-control" id="quotationNumber" name="quotationNumber" value="E1-Q-2555-23">
                         </div>
                         <div class="form-group">
                             <label for="status">Status:</label>
-                            <input type="text" class="form-control" id="status" name="status">
+                            <select class="form-control" id="status" name="status">
+                                <option value="Submitted">Submitted</option>
+                                <option value="Evalution">Evalution</option>
+                                <option value="negotiation">negotiation</option>
+                                <option value="Won">Won</option>
+                                <option value="Lost">Lost</option>
+                        
+                            </select>
                         </div>
                         <div class="form-group">
                             <label for="date">Issue Date:</label>
-                            <input type="text" class="form-control" id="date" name="issueDate">
+                            <input type="date" class="form-control" id="date" name="issueDate">
+                        </div>
+                        <div class="form-group">
+                            <label for="craeter">Creater:</label>
+                            <select class="form-control" id="creater" name="creater">
+                                <option value="zaheer">Zaheer</option>
+                                <option value="zeeshan">Zeeshan</option>
+                                <option value="salah">Salah</option>
+                        
+                            </select>
                         </div>
                         <div class="form-group">
                             <label for="file">Upload File:</label>

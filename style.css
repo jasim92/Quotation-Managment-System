@@ -12,3 +12,25 @@ tbody tr:hover {
     background-color: #e3f2fd;
 
 }
+.glowing {
+    display: inline-block;
+    border-radius: 25px;
+    background-color: #e3f2fd;
+    box-shadow: 0 0 5px #e3f2fd,
+    0 0 25px #e3f2fd;
+}
+
+.glowing:hover{
+    display: inline-block;
+    border-radius: 25px;
+    background-color: #e3f2fd;
+    box-shadow: 0 0 5px #e3f2fd,
+    0 0 25px #e3f2fd,
+    0 0 50px #e3f2fd,
+    0 0 100px #e3f2fd,
+    0 0 200px cyan;
+}
+
+.alert{
+    display: none;
+}

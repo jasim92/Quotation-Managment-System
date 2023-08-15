@@ -15,38 +15,46 @@
 
         <div class="container-fluid">
             <span class="navbar-brand mb-0 h1">Quotation Management System</span>
+            <div class="col-sm text-right">
+                <span id="userNameWelcome" class="h6 mr-4">Quotation Management System</span>
+                <button id="logout" type="button" class="btn btn-outline-primary" data-toggle="modal"
+                    data-target="#exampleModalCenter">Logout</button>
+            </div>
             <form class="d-flex" role="search" id="form">
                 <input class="search form-control me-2" type="search" placeholder="Search" aria-label="Search"
                     id="search">
             </form>
         </div>
     </nav>
-   
+    <div id="error-msg">
+
+    </div>
+
     <div class="container btn-container">
         <div class="row">
-          <div class="col-sm text-left">
-            <button id="addButton" type="button" class="btn btn-outline-primary" data-toggle="modal"
-            data-target="#exampleModalCenter">Add</button>
-          </div>
-          <div class="col-sm text-center">
-            <h3 class="glowing" id="total-value">Value=> </h3>
-          </div>
-          <div class="col-sm text-right">
-            <div class="dropdown">
-                <button class="btn btn-outline-primary dropdown-toggle" type="button" id="dropdownMenuButton"
-                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Filter Menu
-                </button>
-                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                    <option class="dropdown-item" data-value="all">All</option>
-                    <option class="dropdown-item" data-value="zeeshan">Zeeshan</option>
-                    <option class="dropdown-item" data-value="salah">Salahuddin</option>
-                    <option class="dropdown-item" data-value="zaheer">Mohammed Zaheer</option>
+            <div class="col-sm text-left">
+                <button id="addButton" type="button" class="btn btn-outline-primary" data-toggle="modal"
+                    data-target="#exampleModalCenter">Add</button>
+            </div>
+            <div class="col-sm text-center">
+                <h3 class="glowing" id="total-value">Value=> </h3>
+            </div>
+            <div class="col-sm text-right">
+                <div class="dropdown">
+                    <button class="btn btn-outline-primary dropdown-toggle" type="button" id="dropdownMenuButton"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Filter Menu
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <option class="dropdown-item" data-value="all">All</option>
+                        <option class="dropdown-item" data-value="Zeeshan">Zeeshan</option>
+                        <option class="dropdown-item" data-value="Salah">Salahuddin</option>
+                        <option class="dropdown-item" data-value="Mohammed">Mohammed Zaheer</option>
+                    </div>
                 </div>
             </div>
-          </div>
         </div>
-      </div>
+    </div>
 
     <div class="table-container">
         <table class="table" id="myTable">
@@ -55,6 +63,7 @@
                     <th scope="col">#</th>
                     <th scope="col">Client Name</th>
                     <th scope="col">Quotation No.</th>
+                    <th scope="col">Product Name</th>
                     <th scope="col">Status</th>
                     <th scope="col">Issue date</th>
                     <th scope="col">Created by</th>
@@ -85,46 +94,72 @@
                     <form id="quotationForm">
                         <div class="alert alert-danger alert-dismissible fade show" role="alert" id="form-alert">
                             <strong>Holy guacamole!</strong> You should check in on some of those fields below.
-        
-                          </div>
+
+                        </div>
                         <div class="form-group">
-                            <label for="name" class="form-label">Client Name:</label>
+                            <label for="name" class="form-label">Client Name</label>
                             <input type="text" class="form-control" id="name" name="clientName" required>
                         </div>
                         <div class="form-group">
-                            <label for="quotationNumber">Quotation Number:</label>
-                            <input type="text" class="form-control" id="quotationNumber" name="quotationNumber" value="E1-Q-2023-001" required>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label for="quotationNumber">Quotation Number</label>
+                                    <input type="text" class="form-control" id="quotationNumber" name="quotationNumber"
+                                        value="E1-Q-2023-001" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="productName">Product Name</label>
+                                    <input type="text" class="form-control" id="productName" name="productName"
+                                        value="" placeholder="Rokid" required>
+                                </div>
+                            </div>
+
                         </div>
+             
                         <div class="form-group">
-                            <label for="status">Status:</label>
-                            <select class="form-control" id="status" name="status" required>
-                                <option value="Submitted">Submitted</option>
-                                <option value="Evalution">Evalution</option>
-                                <option value="negotiation">negotiation</option>
-                                <option value="Won">Won</option>
-                                <option value="Lost">Lost</option>
-                        
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="date">Issue Date:</label>
+                            <label for="date">Issue Date</label>
                             <input type="date" class="form-control" id="date" name="issueDate" required>
                         </div>
                         <div class="form-group">
                             <label for="Value">Value</label>
-                            <input type="number" class="form-control" id="value" name="value" required>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="value" name="value" required>
+                                <div class="input-group-append">
+                                    <select class="form-control" id="currency-select" name="currency" required>
+                                        <option value="aed">AED</option>
+                                        <option value="usd">USD</option>
+
+                                        <!-- Add more currency options as needed -->
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                         <div class="form-group">
-                            <label for="creater">Creater:</label>
-                            <select class="form-control" id="creater" name="creater" required>
-                                <option value="zaheer">Zaheer</option>
-                                <option value="zeeshan">Zeeshan</option>
-                                <option value="salah">Salah</option>
-                        
-                            </select>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label for="status">Status</label>
+                                    <select class="form-control" id="status" name="status" required>
+                                        <option value="Submitted">Submitted</option>
+                                        <option value="Evalution">Evalution</option>
+                                        <option value="negotiation">negotiation</option>
+                                        <option value="Won">Won</option>
+                                        <option value="Lost">Lost</option>
+        
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="creater">Creater</label>
+                                    <select class="form-control" id="creater" name="creater" required>
+                                        <option value="mohammed">Mohammed</option>
+                                        <option value="zeeshan">Zeeshan</option>
+                                        <option value="salah">Salah</option>
+
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                         <div class="form-group">
-                            <label for="file">Upload File:</label>
+                            <label for="file">Upload File</label>
                             <input type="file" class="form-control-file" id="fileInput" name="file" required>
                         </div>
                         <div class="modal-footer">
@@ -133,7 +168,7 @@
                         </div>
                     </form>
                 </div>
-                
+
             </div>
         </div>
     </div>

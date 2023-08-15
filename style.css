@@ -31,6 +31,26 @@ tbody tr:hover {
     0 0 200px cyan;
 }
 
-.alert{
+.alert-dismissible{
     display: none;
 }
+
+.alert{
+    text-align: center;
+}
+
+/* Add this to your styles.css file */
+.input-group {
+    position: relative;
+    display: flex;
+    width: 100%;
+}
+
+.input-group-append {
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    border-left: 1px solid #ccc;
+    background-color: #fff;
+}
+

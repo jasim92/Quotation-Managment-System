@@ -1,9 +1,10 @@
+
 const jwtToken = localStorage.getItem("jwtToken");
-    if (!jwtToken) {
-        // If not authenticated, redirect to the login page
-        window.location.href = "loginPage.html";
-    
-    }
+if (!jwtToken) {
+    // If not authenticated, redirect to the login page
+    window.location.href = "loginPage.html";
+
+}
 const mainListContainer = document.getElementById("main");
 const mainTableBody = document.getElementById("tablesBody");
 const formElement = document.getElementById('quotationForm');
@@ -15,24 +16,42 @@ const addButton = document.getElementById('addButton');
 const logoutButton = document.getElementById('logout');
 const usernameText = document.getElementById('userNameWelcome');
 
-usernameText.textContent = "Welcome, "+localStorage.getItem("user").toUpperCase();
 
-const SERVER_URL = "http://192.168.0.132:1337/api/quotations";
+usernameText.textContent = "Welcome, " + localStorage.getItem("user").toUpperCase();
+
+let fileURL = '';
+const BASE_URL = "http://192.168.0.132:1337";
+const SERVER_URL = BASE_URL + "/api/quotations";
 var newQueryUrl = '';
 let quotationNumberForForm;
+
 getDropdownValue();
 
 // to increament quotation number based on previous number
 addButton.addEventListener("click", function () {
+
+    // this will diable the dropdown option of upload
+     document.getElementById("fileOptions").setAttribute('disabled', true);
+
+    // adding quotation number automatically
     const year = new Date().getFullYear();
     quotationElement.value = "E1-Q-" + year + "-" + quotationNumberForForm;
 
-    createrElement.value = localStorage.getItem("user");
+    //showing user name with greeting
+    const user = localStorage.getItem("user");
+    createrElement.value = user.charAt(0).toUpperCase() + user.slice(1);
 
+    //showing current date by default
     const currentDate = new Date().toISOString().split('T')[0];
     document.getElementById('date').value = currentDate;
 
-    
+    // setting default values of form on button clicked
+    document.getElementById("name").value = "";
+    document.getElementById("productName").value = "";
+    document.getElementById("value").value = "";
+    document.getElementById("status").value = "Submitted";
+
+
 
 });
 
@@ -52,15 +71,15 @@ document.getElementById("saveButton").addEventListener("click", async function (
             }
             else {
 
-                if(currentElement.name==="currency" && currentElement.value==="usd")
-                {
+                if (currentElement.name === "currency" && currentElement.value === "usd") {
                     const newValue = data.value * 3.67;
                     data['value'] = newValue;
-                    
+
+                }
+                if (currentElement.name === 'fileOptions') {
+                    data['fileUrl'] = fileURL;
                 }
                 data[currentElement.name] = currentElement.value;
-
-               
 
             }
 
@@ -77,19 +96,20 @@ document.getElementById("saveButton").addEventListener("click", async function (
     try {
 
         // Check if a file is selected before proceeding with the upload
-        if (fileInput.files.length > 0) {
+        if (fileInput.files.length > 0 || data.fileOptions === 'existing') {
+            fileInput.removeAttribute('required');
             const createResponse = await fetch('http://192.168.0.132:1337/api/quotations', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: "Bearer "+localStorage.getItem("jwtToken"),
+                    Authorization: "Bearer " + localStorage.getItem("jwtToken"),
                 },
                 body: JSON.stringify({
                     data: data,
                 }),
             });
 
-            if (createResponse.ok) {
+            if (createResponse.ok && fileInput.files.length > 0) {
                 const createdEntry = await createResponse.json();
                 console.log('createdEntry:', createdEntry.data.id);
                 const refId = createdEntry.data.id;
@@ -114,7 +134,7 @@ document.getElementById("saveButton").addEventListener("click", async function (
                     method: 'POST',
                     body: formData,
                     headers: {
-                        Authorization: "Bearer "+localStorage.getItem("jwtToken"),
+                        Authorization: "Bearer " + localStorage.getItem("jwtToken"),
                     }
                 });
 
@@ -128,15 +148,21 @@ document.getElementById("saveButton").addEventListener("click", async function (
                     console.log('Failed to upload file:', errorData);
                 }
 
+            } else if (createResponse.ok && data.fileOptions === 'existing') {
+
+                console.log("updated successfully");
+
             } else {
                 const errorData = await createResponse.json();
                 console.log('Failed to create the entry:', errorData);
             }
-        } else {
+        }
+        else {
+
             const msg = 'No file selected for upload.';
             formAlertFunction(msg);
-
         }
+
     } catch (error) {
         console.error('Error:', error);
     }
@@ -147,7 +173,7 @@ const getQuotationList = async (queryUrl, searching, selectedValue) => {
     let options = {
         method: "GET",
         headers: {
-            Authorization: "Bearer "+localStorage.getItem("jwtToken"),
+            Authorization: "Bearer " + localStorage.getItem("jwtToken"),
         }
     };
     if (searching == false) {
@@ -165,27 +191,14 @@ const getQuotationList = async (queryUrl, searching, selectedValue) => {
                 const filteredRows = []; // Array to store the filtered rows
                 const quoteArray = [];
                 result.data.forEach((element, index) => {
-
-                    const { clientName, status, quotationNumber, issueDate, file, creater, value, productName } = element.attributes;
+                    const id = element.id;
+                    const { clientName, status, quotationNumber, issueDate, file, creater, value, productName, fileUri } = element.attributes;
                     quoteArray.push(parseInt(quotationNumber.slice(10,)));
 
                     if (!selectedValue || creater.includes(selectedValue)) {
 
                         total_v += value;
-                        const row = document.createElement('tr');
-                        //changing inner html of table and pushing values
-                        row.innerHTML = `
-                        <th scope="row">${index + 1}</th>
-                        <td>${clientName}</td>
-                        <td>${quotationNumber}</td>
-                        <td>${productName}</td>
-                        <td>${status}</td>
-                        <td>${issueDate}</td>
-                        <td>${creater}</td>
-                        <td>${value}</td>
-                        <td><a href="http://192.168.0.132:1337${file.data.attributes.url}" target="_blank">View</a></td>
-                    `;
-                        filteredRows.push(row);
+                        setTableContents(id, clientName, status, quotationNumber, issueDate, file, creater, value, productName, fileUri, filteredRows);
 
                     }
 
@@ -209,7 +222,7 @@ const getQuotationList = async (queryUrl, searching, selectedValue) => {
         })
         .catch(error => {
             console.log('error', error);
-            getServerStatus("Server is not Running. Please contact administrator.");
+            getAlertsBanner("Server is not Running. Please contact administrator.", "alert-danger");
         });
 }
 
@@ -279,22 +292,22 @@ function formAlertFunction(alertMsg) {
     formAlert.style.display = 'block'; // Show the alert
 }
 
-function getServerStatus(message) {
-    const errorMsg = document.getElementById('error-msg');
-    if (errorMsg) {
+function getAlertsBanner(message, alertType) {
+    const alertElement= document.getElementById('alert-msg');
+    if (alertElement) {
         const divElement = document.createElement("div");
-        divElement.classList.add("alert", "alert-danger");
+        divElement.classList.add("alert", alertType);
         divElement.setAttribute("role", "alert");
         divElement.innerHTML = `${message}`;
 
-        errorMsg.appendChild(divElement);
+        alertElement.appendChild(divElement);
     }
     else {
-        console.warn('Element with id "error-msg" not found.');
+        console.warn('Element with id "alert-msg" not found.');
     }
 }
 
-logoutButton.addEventListener("click", ()=>{
+logoutButton.addEventListener("click", () => {
     logOutUser();
 });
 
@@ -307,6 +320,120 @@ function logOutUser() {
     window.location.href = "loginPage.html";
 }
 
+document.getElementById("myTable").addEventListener("click", (event) => {
+    if (event.target.classList.contains("edtImg")) {
+        const idNumCell = getClikedRowData(event, 'th:nth-child(1)');
+
+        if (idNumCell) {
+
+            console.log(idNumCell);
+            // getting all the required data of the row using getClickedRow()
+            document.getElementById("name").value = getClikedRowData(event, 'td:nth-child(2)');
+            document.getElementById("productName").value = getClikedRowData(event, 'td:nth-child(4)');
+            document.getElementById("date").value = getClikedRowData(event, 'td:nth-child(6)');
+            document.getElementById("value").value = getClikedRowData(event, 'td:nth-child(8)');
+            document.getElementById("status").value = getClikedRowData(event, 'td:nth-child(5)');
+            document.getElementById("creater").value = getClikedRowData(event, 'td:nth-child(7)');
+            fileURL = getClikedRowData(event, 'td:nth-child(9) a');
 
 
-    
+            // here i am automatically setting value of quotation number and checks for revision 
+            const qn = getClikedRowData(event, 'td:nth-child(3)');
+            if (!qn.includes("R")) {
+                document.getElementById("quotationNumber").value = qn + "-R1";
+            }
+            else {
+                const rev = parseInt(qn.slice(16,)) + 1;
+                document.getElementById("quotationNumber").value = qn.slice(0, 16) + rev;
+            }
+        }
+
+        // this will enable the dropdown options of upload whether to choose new or existing
+        document.getElementById("fileOptions").removeAttribute('disabled');
+
+        // it is jQuery to show the modal (adding new quotation form)
+        $('#exampleModalCenter').modal('show');
+
+    }
+});
+
+document.getElementById("myTable").addEventListener("click", (event) => {
+    if (event.target.classList.contains("delImg")) {
+        const idNumCell = getClikedRowData(event, 'th:nth-child(1)');
+
+        $('#confirmationModal').modal('show');
+
+        document.getElementById("confirmDeleteButton").addEventListener("click", () => {
+            deleteQuotationById(idNumCell);
+        });
+
+    }
+});
+
+async function deleteQuotationById(id) {
+    return await fetch(SERVER_URL + "/" + id, options = {
+        method: "DELETE",
+        headers: {
+            Authorization: "Bearer " + localStorage.getItem("jwtToken"),
+        }
+    })
+        .then(response => {
+            if (response.status === 200) {
+                $('#confirmationModal').modal('hide');
+                getAlertsBanner("Deleted Successfully", "alert-success");
+                location.reload();
+                return response.json();
+            }
+            else {
+                console.log("problem");
+                getAlertsBanner("Not Deleted, some problem occured", "alert-danger");
+                return null;
+            }
+        })
+        .then(result => {
+            console.log(result);
+            location.reload();
+            return result;
+        })
+        .catch(error => {
+            console.error(error);
+        });
+}
+
+
+function getClikedRowData(event, selector) {
+    const clickedRow = event.target.closest('tr'); // Get the clicked row
+    const cell = clickedRow.querySelector(selector); // Get the  cell
+
+    if (selector.includes('a')) {
+        return cell.getAttribute('href');
+
+    } else {
+        const data = cell.textContent.trim();
+        return data;
+    }
+}
+
+function setTableContents(id, clientName, status, quotationNumber, issueDate, file, creater, value, productName, fileUri, filteredRows) {
+    const row = document.createElement('tr');
+
+    const fileLink = fileUri === null ? `${BASE_URL}${file.data.attributes.url}` : fileUri;
+
+    //changing inner html of table and pushing values
+    row.innerHTML = `
+    <th scope="row">${id}</th>
+    <td>${clientName}</td>
+    <td>${quotationNumber}</td>
+    <td>${productName}</td>
+    <td>${status}</td>
+    <td>${issueDate}</td>
+    <td>${creater}</td>
+    <td>${value}</td>
+    <td><a href="${fileLink}" target="_blank"><img src="/photos/eye.png" alt="edit" class="VueImg"  height="20px" width="20px"></a></td>
+    <td><img src="/photos/edit.png" alt="edit" class="edtImg"  height="20px" width="20px"></td>
+    <td><img src="/photos/trash.png" alt="edit" class="delImg"  height="20px" width="20px"></td>
+`;
+    filteredRows.push(row);
+}
+
+

@@ -31,7 +31,10 @@ getDropdownValue();
 addButton.addEventListener("click", function () {
 
     // this will diable the dropdown option of upload
-     document.getElementById("fileOptions").setAttribute('disabled', true);
+    document.getElementById("fileUploadOptions").setAttribute('hidden', true);
+    document.getElementById("updateButton").setAttribute('hidden', true);
+    document.getElementById("saveButton").removeAttribute('hidden');
+    document.getElementById("fileColumn").removeAttribute('hidden');
 
     // adding quotation number automatically
     const year = new Date().getFullYear();
@@ -57,118 +60,17 @@ addButton.addEventListener("click", function () {
 
 document.getElementById("saveButton").addEventListener("click", async function (e) {
     e.preventDefault();
-    const formElements = formElement.elements;
-    // Get the file input element
-    const fileInput = document.getElementById('fileInput');
-    const data = {};
-    const erroMessages = [];
-    for (let i = 0; i < formElements.length; i++) {
-        const currentElement = formElements[i];
-        if (!['submit', 'file'].includes(currentElement.type)) {
-            if (!currentElement.value) {
-                const msg = currentElement.name;
-                erroMessages.push(msg);
-            }
-            else {
+    console.log("clicked on save");
+    PostAndPut(SERVER_URL, "POST");
 
-                if (currentElement.name === "currency" && currentElement.value === "usd") {
-                    const newValue = data.value * 3.67;
-                    data['value'] = newValue;
-
-                }
-                if (currentElement.name === 'fileOptions') {
-                    data['fileUrl'] = fileURL;
-                }
-                data[currentElement.name] = currentElement.value;
-
-            }
-
-        }
-    }
-    console.log(data);
-
-    if (erroMessages.length > 0) {
-        const errorMsg = erroMessages.join(', ');
-        formAlertFunction(errorMsg + " cannot be empty");
-    }
-
-
-    try {
-
-        // Check if a file is selected before proceeding with the upload
-        if (fileInput.files.length > 0 || data.fileOptions === 'existing') {
-            fileInput.removeAttribute('required');
-            const createResponse = await fetch('http://192.168.0.132:1337/api/quotations', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: "Bearer " + localStorage.getItem("jwtToken"),
-                },
-                body: JSON.stringify({
-                    data: data,
-                }),
-            });
-
-            if (createResponse.ok && fileInput.files.length > 0) {
-                const createdEntry = await createResponse.json();
-                console.log('createdEntry:', createdEntry.data.id);
-                const refId = createdEntry.data.id;
-
-
-
-                // Create a new FormData object
-                const formData = new FormData();
-
-                // Append the file to the FormData object
-                for (let i = 0; i < fileInput.files.length; i++) {
-                    const file = fileInput.files[i];
-                    formData.append(`files`, file, file.name);
-                }
-
-                formData.append('ref', 'api::quotation.quotation');
-                formData.append('refId', refId);
-                formData.append('field', 'file');
-                console.log('refId:', refId);
-
-                const uploadResponse = await fetch('http://192.168.0.132:1337/api/upload/', {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        Authorization: "Bearer " + localStorage.getItem("jwtToken"),
-                    }
-                });
-
-                if (uploadResponse.ok) {
-                    mainTableBody.innerHTML = '';
-                    console.log('File uploaded and linked to the entry successfully!');
-                    $('#exampleModalCenter').modal('hide');
-                    getQuotationList(SERVER_URL, false);
-                } else {
-                    const errorData = await uploadResponse.json();
-                    console.log('Failed to upload file:', errorData);
-                }
-
-            } else if (createResponse.ok && data.fileOptions === 'existing') {
-
-                console.log("updated successfully");
-
-            } else {
-                const errorData = await createResponse.json();
-                console.log('Failed to create the entry:', errorData);
-            }
-        }
-        else {
-
-            const msg = 'No file selected for upload.';
-            formAlertFunction(msg);
-        }
-
-    } catch (error) {
-        console.error('Error:', error);
-    }
 });
 
+
+
 const getQuotationList = async (queryUrl, searching, selectedValue) => {
+    // to display loading icon during saving data
+    const loadingElement = document.getElementById("loadingIcons");
+    loadingElement.style.display = "block";
     mainListContainer.innerHTML = "";
     let options = {
         method: "GET",
@@ -212,6 +114,7 @@ const getQuotationList = async (queryUrl, searching, selectedValue) => {
                 });
 
                 quotationNumberForForm = Math.max(...quoteArray) + 1;
+                loadingElement.style.display = "none";
             } else {
 
                 getServerStatus("There is no data in Server");
@@ -223,6 +126,7 @@ const getQuotationList = async (queryUrl, searching, selectedValue) => {
         .catch(error => {
             console.log('error', error);
             getAlertsBanner("Server is not Running. Please contact administrator.", "alert-danger");
+            // loadingElement.style.display = "none";
         });
 }
 
@@ -293,7 +197,7 @@ function formAlertFunction(alertMsg) {
 }
 
 function getAlertsBanner(message, alertType) {
-    const alertElement= document.getElementById('alert-msg');
+    const alertElement = document.getElementById('alert-msg');
     if (alertElement) {
         const divElement = document.createElement("div");
         divElement.classList.add("alert", alertType);
@@ -311,14 +215,6 @@ logoutButton.addEventListener("click", () => {
     logOutUser();
 });
 
-function logOutUser() {
-    // Remove the JWT token from localStorage
-    localStorage.removeItem("jwtToken");
-    localStorage.removeItem("user");
-
-    // Redirect to the login page or any other appropriate action
-    window.location.href = "loginPage.html";
-}
 
 document.getElementById("myTable").addEventListener("click", (event) => {
     if (event.target.classList.contains("edtImg")) {
@@ -346,15 +242,26 @@ document.getElementById("myTable").addEventListener("click", (event) => {
                 const rev = parseInt(qn.slice(16,)) + 1;
                 document.getElementById("quotationNumber").value = qn.slice(0, 16) + rev;
             }
+
+
+            // this will enable the dropdown options of upload whether to choose new or existing
+            document.getElementById("fileUploadOptions").removeAttribute('hidden');
+            document.getElementById("updateButton").setAttribute('hidden', true);
+            document.getElementById("saveButton").removeAttribute('hidden');
+            if (document.getElementById("fileOptions").value === "existing") {
+                document.getElementById("fileColumn").setAttribute("hidden", true);
+
+            }
         }
 
-        // this will enable the dropdown options of upload whether to choose new or existing
-        document.getElementById("fileOptions").removeAttribute('disabled');
+
 
         // it is jQuery to show the modal (adding new quotation form)
         $('#exampleModalCenter').modal('show');
 
     }
+
+    console.log(fileURL);
 });
 
 document.getElementById("myTable").addEventListener("click", (event) => {
@@ -364,41 +271,54 @@ document.getElementById("myTable").addEventListener("click", (event) => {
         $('#confirmationModal').modal('show');
 
         document.getElementById("confirmDeleteButton").addEventListener("click", () => {
+
             deleteQuotationById(idNumCell);
         });
 
     }
 });
 
-async function deleteQuotationById(id) {
-    return await fetch(SERVER_URL + "/" + id, options = {
-        method: "DELETE",
-        headers: {
-            Authorization: "Bearer " + localStorage.getItem("jwtToken"),
+document.getElementById("myTable").addEventListener("dblclick", (event) => {
+
+    const idNumCell = getClikedRowData(event, 'th:nth-child(1)');
+    console.log(idNumCell);
+
+    if (idNumCell) {
+
+
+        // getting all the required data of the row using getClickedRow()
+        document.getElementById("name").value = getClikedRowData(event, 'td:nth-child(2)');
+        document.getElementById("productName").value = getClikedRowData(event, 'td:nth-child(4)');
+        document.getElementById("date").value = getClikedRowData(event, 'td:nth-child(6)');
+        document.getElementById("value").value = getClikedRowData(event, 'td:nth-child(8)');
+        document.getElementById("status").value = getClikedRowData(event, 'td:nth-child(5)');
+        document.getElementById("creater").value = getClikedRowData(event, 'td:nth-child(7)');
+        fileURL = getClikedRowData(event, 'td:nth-child(9) a');
+        document.getElementById("quotationNumber").value = getClikedRowData(event, 'td:nth-child(3)');
+        // document.getElementById("fileOptions").value = "existing";
+
+
+        // this will enable the dropdown options of upload whether to choose new or existing
+        document.getElementById("fileUploadOptions").removeAttribute('hidden');
+        document.getElementById("updateButton").removeAttribute('hidden');
+        document.getElementById("saveButton").setAttribute('hidden', true);
+        if (document.getElementById("fileOptions").value === "existing") {
+            document.getElementById("fileColumn").setAttribute("hidden", true);
+
         }
-    })
-        .then(response => {
-            if (response.status === 200) {
-                $('#confirmationModal').modal('hide');
-                getAlertsBanner("Deleted Successfully", "alert-success");
-                location.reload();
-                return response.json();
-            }
-            else {
-                console.log("problem");
-                getAlertsBanner("Not Deleted, some problem occured", "alert-danger");
-                return null;
-            }
-        })
-        .then(result => {
-            console.log(result);
-            location.reload();
-            return result;
-        })
-        .catch(error => {
-            console.error(error);
-        });
-}
+    }
+
+    $('#exampleModalCenter').modal('show');
+
+    document.getElementById("updateButton").addEventListener("click", (event) => {
+        event.preventDefault();
+        console.log("clciked on update");
+        PostAndPut(SERVER_URL + "/" + idNumCell, "PUT");
+    });
+
+    console.log(fileURL);
+
+});
 
 
 function getClikedRowData(event, selector) {
@@ -415,12 +335,12 @@ function getClikedRowData(event, selector) {
 }
 
 function setTableContents(id, clientName, status, quotationNumber, issueDate, file, creater, value, productName, fileUri, filteredRows) {
-    const row = document.createElement('tr');
+    try {
+        const row = document.createElement('tr');
+        const fileLink = (fileUri === null || fileUri === "") ? `${BASE_URL}${file.data.attributes.url}` : fileUri;
 
-    const fileLink = fileUri === null ? `${BASE_URL}${file.data.attributes.url}` : fileUri;
-
-    //changing inner html of table and pushing values
-    row.innerHTML = `
+        //changing inner html of table and pushing values
+        row.innerHTML = `
     <th scope="row">${id}</th>
     <td>${clientName}</td>
     <td>${quotationNumber}</td>
@@ -430,10 +350,201 @@ function setTableContents(id, clientName, status, quotationNumber, issueDate, fi
     <td>${creater}</td>
     <td>${value}</td>
     <td><a href="${fileLink}" target="_blank"><img src="/photos/eye.png" alt="edit" class="VueImg"  height="20px" width="20px"></a></td>
-    <td><img src="/photos/edit.png" alt="edit" class="edtImg"  height="20px" width="20px"></td>
+    <td><img src="/photos/revision.png" alt="edit" class="edtImg"  height="20px" width="20px"></td>
     <td><img src="/photos/trash.png" alt="edit" class="delImg"  height="20px" width="20px"></td>
 `;
-    filteredRows.push(row);
+        filteredRows.push(row);
+    } catch (error) {
+        console.log(error);
+    }
 }
 
+
+async function PostAndPut(url, method) {
+
+    // to display loading icon during saving data
+    const loadingElement = document.getElementById("loadingIcon");
+    loadingElement.style.display = "block";
+
+    const formElements = formElement.elements;
+    // Get the file input element
+    const fileInput = document.getElementById('fileInput');
+    const data = {};
+    const erroMessages = [];
+    for (let i = 0; i < formElements.length; i++) {
+        const currentElement = formElements[i];
+        if (!['submit', 'file'].includes(currentElement.type)) {
+            if (!currentElement.value) {
+                const msg = currentElement.name;
+                erroMessages.push(msg);
+            }
+            else {
+
+                if (currentElement.name === "currency" && currentElement.value === "usd") {
+                    const newValue = data.value * 3.67;
+                    data['value'] = newValue;
+
+                }
+                if (currentElement.name === 'fileOptions') {
+                    if (currentElement.value === "existing") {
+                        console.log("exisiting url: " + fileURL);
+                        data['fileUri'] = fileURL;
+                    }
+                }
+                data[currentElement.name] = currentElement.value;
+
+            }
+
+        }
+    }
+    console.log(data);
+
+
+    if (erroMessages.length > 0) {
+        const errorMsg = erroMessages.join(', ');
+        formAlertFunction(errorMsg + " cannot be empty");
+    }
+
+
+    try {
+
+        // Check if a file is selected before proceeding with the upload
+        if (fileInput.files.length > 0 || data.fileOptions === 'existing') {
+            fileInput.removeAttribute('required');
+            const options = {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: "Bearer " + localStorage.getItem("jwtToken"),
+                },
+                body: JSON.stringify({
+                    data: data,
+                }),
+            }
+            const createResponse = await fetch(url, options);
+
+            if (createResponse.ok && fileInput.files.length > 0) {
+                fileURL = "";
+                const createdEntry = await createResponse.json();
+                console.log('createdEntry:', createdEntry.data.id);
+                const refId = createdEntry.data.id;
+
+
+
+                // Create a new FormData object
+                const formData = new FormData();
+
+                // Append the file to the FormData object
+                for (let i = 0; i < fileInput.files.length; i++) {
+                    const file = fileInput.files[i];
+                    formData.append(`files`, file, file.name);
+                }
+
+                formData.append('ref', 'api::quotation.quotation');
+                formData.append('refId', refId);
+                formData.append('field', 'file');
+                console.log('refId:', refId);
+
+                const uploadResponse = await fetch('http://192.168.0.132:1337/api/upload/', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        Authorization: "Bearer " + localStorage.getItem("jwtToken"),
+                    }
+                });
+
+                if (uploadResponse.ok) {
+                    mainTableBody.innerHTML = '';
+                    console.log('File uploaded and linked to the entry successfully!');
+                    $('#exampleModalCenter').modal('hide');
+                    getQuotationList(SERVER_URL, false);
+
+
+                } else {
+                    const errorData = await uploadResponse.json();
+                    console.log('Failed to upload file:', errorData);
+
+                }
+
+            } else if (createResponse.ok && data.fileOptions === 'existing') {
+
+                console.log("updated successfully");
+                $('#exampleModalCenter').modal('hide');
+                location.reload();
+                document.getElementById("fileInput").value = "";
+                loadingElement.style.display = "none";
+
+            } else {
+                const errorData = await createResponse.json();
+                console.log('Failed to create the entry:', errorData);
+            }
+            document.getElementById("fileInput").value = "";
+        }
+        else {
+
+            const msg = 'No file selected for upload.';
+            formAlertFunction(msg);
+        }
+
+    } catch (error) {
+        console.error('Error:', error);
+        loadingElement.style.display = "none";
+    }
+    loadingElement.style.display = "none";
+}
+
+document.getElementById("fileOptions").addEventListener("change", (event) => {
+    if (event.target.value === "new") {
+        document.getElementById("fileColumn").removeAttribute("hidden");
+        fileURL = "";
+    } else {
+        document.getElementById("fileColumn").setAttribute("hidden", true);
+        document.getElementById("fileInput").value = "";
+    }
+});
+
+async function deleteQuotationById(id) {
+    // to display loading icon during saving data
+    const loadingElement = document.getElementById("loadingIcons");
+    loadingElement.style.display = "block";
+    return await fetch(SERVER_URL + "/" + id, options = {
+        method: "DELETE",
+        headers: {
+            Authorization: "Bearer " + localStorage.getItem("jwtToken"),
+        }
+    })
+        .then(response => {
+            if (response.status === 200) {
+                $('#confirmationModal').modal('hide');
+                getAlertsBanner("Deleted Successfully", "alert-success");
+                loadingElement.style.display = "none";
+                location.reload();
+                return response.json();
+            }
+            else {
+                console.log("problem");
+                getAlertsBanner("Not Deleted, some problem occured", "alert-danger");
+                loadingElement.style.display = "none";
+                return null;
+            }
+        })
+        .then(result => {
+            console.log(result);
+            location.reload();
+            return result;
+        })
+        .catch(error => {
+            console.error(error);
+            loadingElement.style.display = "none";
+        });
+}
+
+function logOutUser() {
+    // Remove the JWT token from localStorage
+    localStorage.removeItem("jwtToken");
+    localStorage.removeItem("user");
+
+    // Redirect to the login page or any other appropriate action
+    window.location.href = "loginPage.html";
+}
 

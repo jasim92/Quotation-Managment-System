@@ -29,6 +29,9 @@
     <div id="alert-msg">
 
     </div>
+    <div class="loading-overlay" id="loadingIcons">
+        <img src="photos/loading.gif" alt="loading"  width="150" height="" />
+    </div>
 
     <div class="container btn-container">
         <div class="row">
@@ -93,7 +96,12 @@
                     </button>
                 </div>
                 <div class="modal-body">
+                    
                     <form id="quotationForm">
+
+                        <div class="loading-overlay" id="loadingIcon">
+                            <img src="photos/loading.gif" alt="loading"  width="150" height="" />
+                        </div>
                         <div class="alert alert-danger alert-dismissible fade show" role="alert" id="form-alert">
                             <strong>Holy guacamole!</strong> You should check in on some of those fields below.
 
@@ -162,24 +170,28 @@
                         </div>
                         <div class="form-group">
                             <div class="row">
-                                <div class="col-md-6">
+                                <div class="col-md-6" id="fileColumn">
                                     <label for="file">Upload File</label>
                                     <input type="file" class="form-control-file" id="fileInput" name="file" required>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-3" id="fileUploadOptions">
                                     <label for="choose">File Type</label>
-                                    <select id="fileOptions" name="fileOptions"  disabled>
+                                    <select id="fileOptions" name="fileOptions"  >
                                         <option value="new">New File</option>
                                         <option value="existing">Existing File</option>
                                       </select>
+                                    
                                 </div>
                             </div>
                             
-                            
+                           
                         </div>
+                        
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                             <button type="submit" class="btn btn-primary" id="saveButton">Save</button>
+                            <button type="submit" class="btn btn-primary" id="updateButton">Update</button>
+                            
                         </div>
                     </form>
                 </div>

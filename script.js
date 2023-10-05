@@ -20,7 +20,7 @@ const usernameText = document.getElementById('userNameWelcome');
 usernameText.textContent = "Welcome, " + localStorage.getItem("user").toUpperCase();
 
 let fileURL = '';
-const BASE_URL = "http://192.168.0.132:1337";
+const BASE_URL = "http://192.168.0.131:1337";
 const SERVER_URL = BASE_URL + "/api/quotations";
 var newQueryUrl = '';
 let quotationNumberForForm;
@@ -177,6 +177,11 @@ function getDropdownValue() {
                 mainListContainer.innerHTML = '';
                 console.log("Selected value:", selectedValue);
                 getQuotationList(SERVER_URL, false, "Mohammed");
+            }
+            else if(selectedValue == "Joseph"){
+                mainListContainer.innerHTML = '';
+                console.log("Selected value:", selectedValue);
+                getQuotationList(SERVER_URL, false, "Joseph");
             }
             else {
                 mainListContainer.innerHTML = '';
@@ -445,7 +450,7 @@ async function PostAndPut(url, method) {
                 formData.append('field', 'file');
                 console.log('refId:', refId);
 
-                const uploadResponse = await fetch('http://192.168.0.132:1337/api/upload/', {
+                const uploadResponse = await fetch('http://192.168.0.131:1337/api/upload/', {
                     method: 'POST',
                     body: formData,
                     headers: {

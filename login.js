@@ -28,7 +28,7 @@ async function getJWToken(user, pass) {
         }),
     };
 
-    await fetch("http://192.168.0.132:1337/api/auth/local", options)
+    await fetch("http://192.168.0.131:1337/api/auth/local", options)
         .then(response => {
             if(response.status === 200){
                 console.log("200");
